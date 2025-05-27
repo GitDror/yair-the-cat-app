@@ -86,22 +86,7 @@
             100% { transform: rotate(360deg); }
         }
     </style>
-    <!-- Application Structure Plan: 
-        The SPA is structured into four main sections accessible via a top navigation bar:
-        1. הכירו את יאיר (Meet Yair): Introduces the main character and his context (ADHD, family).
-        2. האתגר של הערב (The Evening Challenge): Details Yair's evening struggles, particularly with screen time and transitions.
-        3. ארגז הכלים (The Toolbox): An interactive section where each strategy from the story is a clickable "tool card". Clicking a card opens a modal with details about the strategy. This is the core interactive part for learning the solutions. This section also includes a new LLM-powered "Smart Evening Advisor" feature.
-        4. המסע של יאיר (Yair's Journey): Concludes with Yair's progress and includes an illustrative chart showing improvement over time. This section also includes a new LLM-powered "Bedtime Story Ideas" feature.
-        This structure follows the narrative arc of the story, making it easy for users to understand the problem and the solutions presented. The interactive toolbox aims to engage users directly with the coping strategies. The LLM features enhance the practical application of the story's themes.
-    -->
-    <!-- Visualization & Content Choices:
-        - הכירו את יאיר: Textual content from the story. Simple CSS "cat ears" as a minor visual element. Goal: Inform. Method: Text + HTML/CSS.
-        - האתגר של הערב: Textual content. Goal: Inform about the problem. Method: Text.
-        - ארגז הכלים: Each strategy (לוח זמנים, טיימר, צעד צעד, זמן מסך חכם, מה אתה מרגיש, חיבוקים וסיפורים) is an interactive card. Goal: Organize, Inform, Engage. Method: HTML cards, JS for modal pop-ups with text details. New LLM feature: "Smart Evening Advisor" with text input and generated text output. Goal: Provide practical, personalized advice. Method: HTML input/output, JS fetch to Gemini API.
-        - המסע של יאיר: Textual content. An illustrative line chart (Chart.js) showing "Yair's Progress" over time (fictional data representing decreased difficulty or increased success). Goal: Inform, Show Change. Method: Text + Chart.js Canvas chart. Tooltips configured for clarity. Labels are short and clear. maintainAspectRatio: false is used. New LLM feature: "Bedtime Story Ideas" with text input and generated text output. Goal: Enhance creative bedtime routines. Method: HTML input/output, JS fetch to Gemini API.
-        Justification: This approach aims to make the story's key messages (problem and solutions) interactive and digestible. The toolbox offers a practical, engaging way to explore coping strategies. The chart provides a visual summary of hope and progress. The LLM features add dynamic, personalized advice and creative inspiration, directly linking the story's themes to real-world applicability for parents.
-    -->
-</head>
+    </head>
 <body class="bg-amber-50 text-stone-800 rtl">
 
     <div id="app-container" class="container mx-auto p-4 max-w-5xl">
@@ -280,4 +265,168 @@
 
             navLinks.forEach(link => {
                 link.addEventListener('click', function () {
-                    showSect
+                    showSection(this.dataset.section);
+                });
+            });
+
+            toolCards.forEach(card => {
+                card.addEventListener('click', function () {
+                    const tool = this.dataset.tool;
+                    const details = toolDetails[tool];
+                    if (details) {
+                        modalTitle.textContent = details.title;
+                        modalDescription.textContent = details.description;
+                        modal.classList.remove('hidden');
+                        setTimeout(() => {
+                            modal.classList.remove('opacity-0');
+                        }, 10);
+                    }
+                });
+            });
+
+            closeModalButton.addEventListener('click', function () {
+                modal.classList.add('opacity-0');
+                modal.addEventListener('transitionend', function handler() {
+                    modal.classList.add('hidden');
+                    modal.removeEventListener('transitionend', handler);
+                });
+            });
+
+            modal.addEventListener('click', function (event) {
+                if (event.target === modal) {
+                    modal.classList.add('opacity-0');
+                    modal.addEventListener('transitionend', function handler() {
+                        modal.classList.add('hidden');
+                        modal.removeEventListener('transitionend', handler);
+                    });
+                }
+            });
+
+            // Initial display
+            showSection('intro');
+
+            // Chart.js for Progress Chart
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            const progressChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['שבוע 1', 'שבוע 2', 'שבוע 3', 'שבוע 4', 'שבוע 5', 'שבוע 6'],
+                    datasets: [{
+                        label: 'רמת קושי בשגרת ערב (ציון 1-10)',
+                        data: [8, 7, 6, 5, 4, 3], // Fictional data: decreasing difficulty
+                        borderColor: 'rgb(251, 191, 36)', // Amber 400
+                        backgroundColor: 'rgba(251, 191, 36, 0.2)',
+                        tension: 0.3,
+                        fill: true,
+                        pointBackgroundColor: 'rgb(251, 191, 36)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(251, 191, 36)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                color: '#4a4a4a'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.raw;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            reverse: true, // Lower score is better
+                            title: {
+                                display: true,
+                                text: 'ציון קושי',
+                                color: '#4a4a4a'
+                            },
+                            ticks: {
+                                color: '#4a4a4a'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'זמן',
+                                color: '#4a4a4a'
+                            },
+                            ticks: {
+                                color: '#4a4a4a'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Gemini API Integration (Example - replace with your actual API key and endpoint)
+            const GEMINI_API_KEY = 'YOUR_GEMINI_API_KEY'; // Replace with your actual Gemini API Key
+
+            async function getGeminiResponse(prompt, outputElement, loadingElement) {
+                outputElement.classList.add('hidden');
+                loadingElement.classList.remove('hidden');
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [{
+                                    text: prompt
+                                }]
+                            }]
+                        }),
+                    });
+                    const data = await response.json();
+                    if (data.candidates && data.candidates.length > 0) {
+                        outputElement.textContent = data.candidates[0].content.parts[0].text;
+                    } else {
+                        outputElement.textContent = 'אירעה שגיאה בקבלת התשובה. אנא נסה שוב.';
+                    }
+                    outputElement.classList.remove('hidden');
+                } catch (error) {
+                    console.error('Error fetching from Gemini API:', error);
+                    outputElement.textContent = 'אירעה שגיאה בחיבור לשירות. אנא נסה שוב מאוחר יותר.';
+                    outputElement.classList.remove('hidden');
+                } finally {
+                    loadingElement.classList.add('hidden');
+                }
+            }
+
+            getEveningTipBtn.addEventListener('click', function () {
+                const challenge = eveningChallengeInput.value.trim();
+                if (challenge) {
+                    const prompt = `תאר/י קושי בשגרת ערב של ילד עם ADHD: "${challenge}". תן/תני טיפ קצר, ממוקד ומעשי להורים, בסגנון הסיפור "יאיר גור החתולים", תוך שימוש במטאפורה של "ארגז כלים" או "כלי" ספציפי.`;
+                    getGeminiResponse(prompt, eveningTipOutput, eveningTipLoading);
+                } else {
+                    eveningTipOutput.textContent = 'אנא הזן/הזיני תיאור של הקושי.';
+                    eveningTipOutput.classList.remove('hidden');
+                }
+            });
+
+            generateStoryBtn.addEventListener('click', function () {
+                const keyword = storyKeywordInput.value.trim();
+                if (keyword) {
+                    const prompt = `צור/צרי רעיון קצר לסיפור ילדים לפני השינה (עד 50 מילים) המבוסס על מילת המפתח/נושא: "${keyword}". הסיפור צריך להיות מרגיע ומעודד.`;
+                    getGeminiResponse(prompt, storyIdeaOutput, storyIdeaLoading);
+                } else {
+                    storyIdeaOutput.textContent = 'אנא הזן/הזיני מילת מפתח או נושא לסיפור.';
+                    storyIdeaOutput.classList.remove('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
