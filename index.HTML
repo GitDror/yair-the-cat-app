@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>יאיר גור החתולים: כשהמסך קורא והערב מחכה</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #fef3c7; /* bg-amber-50 changed to a slightly darker shade for contrast */
+            color: #44403c; /* text-stone-800 */
+        }
+        .rtl {
+            direction: rtl;
+        }
+        .ltr {
+            direction: ltr;
+        }
+
+        /* סגנון הלחצנים הראשי - עכשיו באמת בולטות כאליפסות נפרדות */
+        .nav-link {
+            /* Padding גדול מאוד ליצירת אליפסה שמנמנה וברורה */
+            @apply px-16 py-8 text-2xl font-extrabold text-stone-800 bg-amber-100 rounded-full border-4 border-amber-400 shadow-2xl transition-all duration-300;
+            /* צל עמוק במיוחד ואפקט הגדלה דרמטי בריחוף */
+            /* הגדלנו את עוצמת הצל ל-shadow-2xl ובהובר ל-shadow-3xl */
+            @apply hover:bg-amber-200 hover:text-stone-900 hover:shadow-3xl transform hover:scale-110;
+        }
+
+        /* סגנון ללחצן הפעיל/הנבחר */
+        .nav-link.active {
+            @apply bg-amber-500 text-white font-extrabold shadow-3xl scale-110 border-amber-600;
+        }
+
+        /* סגנון למיכל הניווט - עוטף את הלחצנים ונותן להם מרווח הדדי גדול */
+        .nav-container {
+            background-color: #fffbeb; /* רקע בהיר מעט שונה בתוך המיכל */
+            padding: 2rem; /* מרווח פנימי גדול יותר למיכל */
+            border-radius: 1.5rem; /* פינות מעוגלות יותר למיכל */
+            box-shadow: inset 0 4px 6px -1px rgba(0, 0, 0, 0.1), inset 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* צל פנימי עמוק יותר */
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            /* הגדלה משמעותית של המרווח בין הלחצנים (בין האליפסות) */
+            /* הגדלנו את ה-gap משמעותית */
+            gap: 2.5rem; /* מרווח גדול מאוד בין הלחצנים כברירת מחדל */
+            margin-bottom: 2rem; /* mb-8 */
+        }
+        @media (min-width: 640px) {
+            .nav-container {
+                gap: 3.5rem; /* הגדלה נוספת של המרווח במסכים גדולים */
+            }
+        }
+
+        .content-section {
+            @apply p-6 bg-white rounded-xl shadow-lg mt-4 min-h-[60vh];
+        }
+        .tool-card {
+            @apply bg-emerald-50 p-4 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer text-right;
+        }
+        .tool-card h3 {
+            @apply text-emerald-700 font-semibold text-lg mb-2;
+        }
+        .modal {
+            @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 transition-opacity duration-300;
+        }
+        .modal-content {
+            @apply bg-white p-6 rounded-lg shadow-xl max-w-lg w-full text-right;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+                max-width: 700px;
+            }
+        }
+        .btn {
+            @apply px-4 py-2 rounded-lg text-white font-semibold transition-colors;
+        }
+        .btn-primary {
+            @apply bg-amber-500 hover:bg-amber-600;
+        }
+        .btn-secondary {
+            @apply bg-emerald-500 hover:bg-emerald-600;
+        }
+        .cat-ear {
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-bottom: 30px solid #fbbf24;
+            display: inline-block;
+            margin: 0 2px;
+        }
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #fbbf24;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* סגנון כפתור הקראת פסקה / השהיה */
+        .read-paragraph-btn {
+            @apply inline-flex items-center justify-center w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors duration-200 text-xs font-bold mr-2 ml-1; /* קטן, עגול ובולט */
+            flex-shrink: 0; /* למנוע מהכפתור להתכווץ */
+        }
+        .paragraph-with-btn {
+            @apply flex items-start mb-3 text-lg leading-relaxed; /* גמישות כדי להכיל את הכפתור */
+        }
+        .paragraph-text {
+            @apply flex-grow; /* מאפשר לטקסט לתפוס את רוב המקום */
+        }
+
+        /* סגנון כפתור הפאוז הגלובלי */
+        #global-pause-btn {
+            @apply fixed bottom-4 left-1/2 -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-full shadow-lg text-lg font-bold transition-all duration-300 z-40;
+            @apply hover:bg-red-600 hover:scale-105;
+            display: none; /* נסתר כברירת מחדל, יוצג רק כשיש הקראה פעילה */
+        }
+        #global-pause-btn.visible {
+            display: flex; /* מציג את הכפתור כאשר הקראה פעילה */
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-container" class="container mx-auto p-4 max-w-5xl">
+        <header class="my-8 text-center">
+            <h1 class="text-4xl font-bold text-amber-600">יאיר גור החתולים <span class="cat-ear"></span><span class="cat-ear"></span></h1>
+            <p class="text-xl text-stone-700 mt-2">כשהמסך קורא והערב מחכה: סיפור אינטראקטיבי</p>
+        </header>
+
+        <nav class="nav-container">
+            <button data-section="intro" class="nav-link active">הכירו את יאיר</button>
+            <button data-section="challenge" class="nav-link">האתגר של הערב</button>
+            <button data-section="toolbox" class="nav-link">ארגז הכלים</button>
+            <button data-section="journey" class="nav-link">המסע של יאיר</button>
+        </nav>
+
+        <main>
+            <section id="intro-section" class="content-section">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-3xl font-semibold text-emerald-700">הכירו את יאיר!</h2>
+                </div>
+                <div class="paragraph-with-btn" data-paragraph-id="intro-p1">
+                    <button class="read-paragraph-btn" aria-label="הקרא פסקה">🔊</button>
+                    <span class="paragraph-text">היה היה פעם, בבית בעמק קסום, עם ריח תפוזים מתוק שעלה מכל עבר, חי לו יאיר, גור חתולים זריז בן עשר. ליאיר היו עיניים ירוקות נוצצות ושפם ארוך ארוך שקפץ משמחה בכל פעם שחשב על הרפתקה חדשה. הוא גר עם אבא שלו, ועם אחיו אורן בן ה-14, שהיה בוגר ושקט. למרות שיאיר ואורן רבו לא מעט על המחשב, תמיד היה ברור שהם אוהבים מאוד אחד את השני. את אחותו הגדולה, קרן בת ה-17, שגרה בפנימייה, יאיר זכה לראות רק לעיתים רחוקות, אך בכל מפגש הם אהבו מאוד ליצור יחד, לדבר על אומנות וגם לשתף ברגשות. רגעים איתה היו תמיד מיוחדים ואינטימיים.</span>
+                </div>
+                <div class="paragraph-with-btn" data-paragraph-id="intro-p2">
+                    <button class="read-paragraph-btn" aria-label="הקרא פסקה">🔊</button>
+                    <span class="paragraph-text">יאיר היה חתול חכם מאוד, מהסוג שתמיד סקרן ללמוד ולחקור. אבל, כמו שקורה לפעמים, ליאיר הייתה מתנת קצב וריקוד מיוחדת. זה אומר שלפעמים המחשבות שלו היו קופצות מנושא לנושא כמו כדור קופצני, עם קצב משלהן, והיה לו קשה להישאר מרוכז במקום אחד לאורך זמן, כי תמיד היה עוד רעיון שרצה לצאת בריקוד משלו.</span>
+                </div>
+                <div class="paragraph-with-btn" data-paragraph-id="intro-p3">
+                    <button class="read-paragraph-btn" aria-label="הקרא פסקה">🔊</button>
+                    <span class="paragraph-text">יום טיפוסי של יאיר התחיל מוקדם, כשהשמש הציצה מבעד לחלון. אחרי ארוחת בוקר מהירה של גרגרים טעימים בקערה המעוטרת בציורים של עכברים קטנים, יאיר היה יוצא לבית הספר של החתולים. שם, למרות שהיה חכם, היה לו לפעמים קשה לשבת בשקט ולהקשיב למורה הינשופה, במיוחד כשהדלת הייתה פתוחה וריח של פרחים עבר ברוח, או כשציפור קטנה עברה ליד החלון ומשכה את תשומת ליבו.</span>
+                </div>
+                <div class="paragraph-with-btn" data-paragraph-id="intro-p4">
+                    <button class="read-paragraph-btn" aria-label="הקרא פסקה">🔊</button>
+                    <span class="paragraph-text">כשחזר הביתה אחר הצהריים, יאיר היה **מתרפק על השטיח בסלון**. זה היה הזמן שלו! הוא היה שוקע במשחקי מיינקראפט מרתקים על השרת עם חברים, צופה ב**Shorts ביוטיוב**, ואפילו **יוצר בעצמו תוכן מרהיב בנושא מיינקראפט**. השעות היו עוברות במהירות, והוא היה מרגיש שכל האנרגיה שאגר בזמן שנדרש לשבת בשקט בבית הספר – מתמלאת מחדש בקצב קופצני ובריקוד סוער.</span>
+                </div>
+                <div class="paragraph-with-btn" data-paragraph-id="intro-p5">
+                    <button class="read-paragraph-btn" aria-label="הקרא פסקה">🔊</button>
+                    <span class="paragraph-text">כשהערב היה מתקרב, ואור השמש החל להפוך לכתום-ורוד דרך החלונות, יאיר היה מרגיש שמשהו משתנה. מצד אחד, הוא היה עייף מאוד מהיום הארוך והדורש בבית הספר, אבל מצד שני, ההתרגשות ממשחקי המחשב והרצון להמשיך לשחק מילאו אותו. הוא ידע שעוד מעט יגיע הזמן של "שגרת הערב", והמחשבה הזו כבר התחילה לגרום לו לכווץ את השפם הקטן שלו קצת בחשש.</span>
+                </div>
+            </section>
+
+            <section id="challenge-section" class="content-section hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-3xl font-semibold text-emerald-700">האתגר של הערב</h2>
+                </div>
+                <div class="paragraph-with-btn" data-paragraph-id="challenge-p1">
+                    <button class="read-paragraph-btn" aria-label="הקרא פסקה">🔊</button>
+                    <span class="paragraph-text">כשהשמש הייתה שוקעת וקרירות נעימה מילאה את הבית, אבא של יאיר היה קורא: "יאיר! יאיר, חמוד, ארוחת ערב מוכנה!" קולו היה נעים ורגוע בהתחלה, כמו ליטוף פרווה. אבל יאיר היה כל כך שקוע במסך הטלפון שלו – בוהה בעיניים ירוקות ומוצצות במסך הזוהר, שפמו רועד מהתרגשות מאיזה סרטון מצחיק או משחק מהיר – שהוא פשוט לא שמע.</span>
+                </div>
+                <div class="paragraph-with-btn" data-paragraph-id="challenge-p2">
+                    <button class="read-paragraph-btn" aria-label="הקרא פסקה">🔊</button>
+                    <span class="paragraph-text">אבא היה קורא שוב ושוב, וקולו, שהתחיל רך ומלטף, התחזק והפך לפחות נעים. "יאיר! בבקשה, בוא לאכול!" הוא קרא, **ושוב ושוב, עד שאבא כמעט צעק**. אבל יאיר היה **כמו קשור למסך, נבלע לחלוטין בעולמו הדיגיטלי**. הוא היה מותח את "עוד חמש דקות!" שלו עד הקצה, עד שאבא היה ניגש בעצמו ומבקש ממנו להניח את הטלפון. הרגע הזה, שבו נאלץ להיפרד מהמסך, היה קשה מנשוא. זה היה כאילו כל הקסם נעלם באחת, והוא נשאר עם תחושה חלולה, חצי מרוצה וחצי כועס על שההנאה נקטעה.</span>
+                </div>
+                <div class="paragraph-with-btn" data-paragraph-id="challenge-p3">
+                    <button class="read-paragraph-btn" aria-label="הקרא פסקה">🔊</button>
+                    <span class="paragraph-text">ואז, אחרי ארוחת הערב, החלק הקשה באמת היה מתחיל. אבא היה מזכיר: "יאיר, עכשיו הגיע הזמן לסדר את השולחן, לקחת את התרופה, ואז מקלחת וצחצוח שיניים". אבל יאיר היה מתמהמה. הוא היה נעמד ליד השולחן, מזיז צלחת אחת, ואז בוהה בחלל, או מתעסק בפתאום עם פירור קטן. המחשבות שלו היו קופצות, "רגע, איפה שמתי את הכדור שלי? אולי נשחק רק דקה? או שאולי יש איזה חפץ מעניין במגירה?" כל דבר קטן היה הופך להסחת דעת ענקית.</span>
+                </div>
+                <div class="paragraph-with-btn" data-paragraph-id="challenge-p4">
+                    <button class="read-paragraph-btn" aria-label="הקרא פסקה">🔊</button>
+                    <span class="paragraph-text">הוא ידע בדיוק מה הוא צריך לעשות, אבל היה כל כך קשה להתחיל. וגם כשכבר התחיל במשהו, היה לו קשה לסיים. הוא היה שוכח איפה היה, מתחיל משהו אחר, ואז שוב מוסח. תחושת התיסכול הייתה עולה בו כמו כדור צמר שמתגלגל בבטן, ולפעמים, אם אבא היה חוזר ומזכיר לו שוב ושוב, יאיר היה מגיב בנהימה קטנה, או אפילו בכעס, כי הוא הרגיש שאף אחד לא מבין כמה זה קשה לו, כמה המוח שלו פשוט לא מצליח "לשמוע" את המשימות האלה.</span>
+                </div>
+            </section>
+
+            <section id="toolbox-section" class="content-section hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-3xl font-semibold text-emerald-700">ארגז הכלים של אבא ויאיר</h2>
+                </div>
+                <div class="paragraph-with-btn" data-paragraph-id="toolbox-p1">
+                    <button class="read-paragraph-btn" aria-label="הקרא פסקה">🔊</button>
+                    <span class="paragraph-text">אבא של יאיר ראה את התסכול בעיניים הירוקות של גור החתולים שלו, והוא ידע שזה לא שובבות רגילה. "יאיר חמוד," אבא אמר בערב אחד, כשיאיר נאנח ליד השולחן המבולגן, "אני רואה שקשה לך עכשיו. אני יודע שזה לא קל כשהמוח שלך רוצה לרוץ לכל מיני כיוונים בבת אחת."</span>
+                </div>
+                <div class="paragraph-with-btn" data-paragraph-id="toolbox-p2">
+                    <button class="read-paragraph-btn" aria-label="הקרא פסקה">🔊</button>
+                    <span class="paragraph-text">אבא חיבק את יאיר חזק, ואז חשב לעצמו: "איך אני יכול לעזור ליאיר למצוא את הדרך **לשגרת הערב**?" הוא נזכר כמה יאיר חכם, וכמה הוא אוהב ללמוד דברים חדשים. אבא החליט שצריך **ללמד את יאיר טריקים חדשים** שיעזרו לו, ממש כמו שמלמדים גור חתולים איך לקפוץ הכי גבוה או לתפוס פרפר.</span>
+                </div>
+                <div class="paragraph-with-btn" data-paragraph-id="toolbox-p3">
+                    <button class="read-paragraph-btn" aria-label="הקרא פסקה">🔊</button>
+                    <span class="paragraph-text">למחרת בבוקר, אבא הציע ליאיר רעיון: "בוא נבנה לנו **'ארגז כלים של ערב'**," אמר אבא בחיוך. "בארגז הזה יהיו כל מיני רעיונות ושיטות שיעזרו לך למצוא את הדרך בחזרה לשגרה כשקשה לך להתארגן." יאיר, סקרן מטבעו, אהב את הרעיון של "ארגז כלים". והם התחילו לנסות!</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="tool-card" data-tool="schedule">
+                        <h3>📅 לוח זמנים מצויר</h3>
+                        <p>אבא ויאיר ציירו יחד לוח עם תמונות של כל שלבי הערב. יאיר אהב להדביק כוכב ליד כל תמונה שהשלים.</p>
+                    </div>
+                    <div class="tool-card" data-tool="timer">
+                        <h3>⏱️ "טיימר משימה!"</h3>
+                        <p>טיימר חזותי עזר ליאיר להתרכז במשימות קצרות, ולראות את הזמן "הולך וקטן".</p>
+                    </div>
+                    <div class="tool-card" data-tool="steps">
+                        <h3>🐾 "צעד צעד, משימה קטנה"</h3>
+                        <p>פירוק משימות גדולות לקטנות הפך את ההתחלה לפחות מפחידה.</p>
+                    </div>
+                    <div class="tool-card" data-tool="screen_time">
+                        <h3>📱 זמן מסך חכם</h3>
+                        <p>קבעו כללים לזמן מסך, כמו טעינת הטלפון עד ארוחת הערב ו"התאווררות" אחרי.</p>
+                    </div>
+                    <div class="tool-card" data-tool="feelings">
+                        <h3>❤️ "מה אתה מרגיש עכשיו?"</h3>
+                        <p>שיחה על רגשות ונשימות עמוקות עזרו ליאיר להבין ולהתמודד עם תסכול.</p>
+                    </div>
+                    <div class="tool-card" data-tool="hugs_stories">
+                        <h3>🤗 חיבוקים וסיפורים</h3>
+                        <p>סיום כל ערב בחיבוק וסיפור עזר להירגע ולהטעין כוחות.</p>
+                    </div>
+                </div>
+
+                <div class="mt-10 p-6 bg-amber-100 rounded-lg shadow-inner text-center">
+                    <h3 class="text-2xl font-semibold text-amber-700 mb-4">✨ יועץ ערב חכם ✨</h3>
+                    <p class="mb-4 text-stone-700">הזינו קושי ספציפי שאתם חווים בשגרת הערב וקבלו טיפ מותאם אישית:</p>
+                    <textarea id="eveningChallengeInput" class="w-full p-3 rounded-lg border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400 mb-4 text-right" rows="3" placeholder="לדוגמה: הילד שלי לא רוצה להתקלח..."></textarea>
+                    <button id="getEveningTipBtn" class="btn btn-primary w-full md:w-auto">קבל טיפ חכם</button>
+                    <div id="eveningTipOutput" class="mt-4 p-3 bg-white rounded-lg border border-emerald-200 text-stone-800 hidden text-right"></div>
+                    <div id="eveningTipLoading" class="hidden mt-4 text-emerald-700">
+                        <div class="loading-spinner"></div>טוען טיפ...
+                    </div>
+                </div>
+            </section>
+
+            <section id="journey-section" class="content-section hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-3xl font-semibold text-emerald-700">המסע של יאיר</h2>
+                </div>
+                <div class="paragraph-with-btn" data-paragraph-id="journey-p1">
+                    <button class="read-paragraph-btn" aria-label="הקרא פסקה">🔊</button>
+                    <span class="paragraph-text">הערבים של יאיר לא הפכו לקסם בן לילה. לפעמים עדיין היה לו קשה, ולפעמים הטיימר עדיין הרגיז אותו. אבל עם כל יום שעבר, יאיר למד עוד דרך, ועוד כלי מארגז הכלים המיוחד שלהם.</span>
+                </div>
+                <div class="paragraph-with-btn" data-paragraph-id="journey-p2">
+                    <button class="read-paragraph-btn" aria-label="הקרא פסקה">🔊</button>
+                    <span class="paragraph-text">אבא שלו תמיד היה שם, עם חיבוק חם, הבנה גדולה, וארגז הכלים המלא ברעיונות חדשים. יאיר התחיל להבין שגם אם המוח שלו קופץ כמו כדור, יש דרכים לרתום אותו, ושאבא תמיד ימצא את הדרך לעזור לו. הוא למד שכל צעד קטן קדימה הוא הצלחה, ושגם אם יום אחד קצת פחות הולך, מחר תמיד אפשר לנסות שוב עם כלי אחר מהארגז.</span>
+                </div>
+                <div class="paragraph-with-btn" data-paragraph-id="journey-p3">
+                    <button class="read-paragraph-btn" aria-label="הקרא פסקה">🔊</button>
+                    <span class="paragraph-text">החשוב ביותר, יאיר הבין שהוא לא לבד בהתמודדות, ואהבה וסבלנות הן לפעמים הכלים הכי חזקים בארגז.</span>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <button id="global-pause-btn">הפסק הכל</button>
+
+    <script>
+        let currentUtterance = null; // משתנה כדי להחזיק את ההקראה הנוכחית
+        let currentReadParagraphButton = null; // משתנה כדי להחזיק את הכפתור של הפסקה המוקראת
+        const globalPauseButton = document.getElementById('global-pause-btn');
+
+        function stopSpeaking() {
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+            }
+            if (currentUtterance) {
+                currentUtterance = null;
+            }
+            // איפוס כפתורי הקראת פסקה
+            if (currentReadParagraphButton) {
+                currentReadParagraphButton.textContent = '🔊'; // חזרה לסמל רמקול
+                currentReadParagraphButton.setAttribute('aria-label', 'הקרא פסקה');
+                currentReadParagraphButton = null;
+            }
+            globalPauseButton.classList.remove('visible'); // הסתר את כפתור הפאוז הגלובלי
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('.content-section');
+            const readParagraphButtons = document.querySelectorAll('.read-paragraph-btn');
+
+            function showSection(sectionId) {
+                stopSpeaking(); // עצור הקראה כשמחליפים סקשן
+                sections.forEach(section => {
+                    section.classList.add('hidden');
+                });
+                document.getElementById(sectionId + '-section').classList.remove('hidden');
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.dataset.section === sectionId) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function () {
+                    showSection(this.dataset.section);
+                });
+            });
+
+            // הצגה ראשונית של סקשן "הכירו את יאיר"
+            showSection('intro');
+
+            // Global Pause Button Listener
+            globalPauseButton.addEventListener('click', function() {
+                stopSpeaking();
+            });
+
+            // פונקציונליות הקראת פסקה / השהיה
+            readParagraphButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const paragraphTextElement = this.nextElementSibling; // מניחים שהטקסט הוא ה-span הבא
+                    if (!paragraphTextElement || !paragraphTextElement.classList.contains('paragraph-text')) {
+                        console.error("לא נמצא אלמנט טקסט פסקה תואם.");
+                        return;
+                    }
+
+                    const textToRead = paragraphTextElement.textContent.trim();
+
+                    // אם אותה פסקה כבר מוקראת
+                    if (currentUtterance && currentReadParagraphButton === this) {
+                        if (speechSynthesis.speaking) {
+                            speechSynthesis.pause(); // השהה
+                            this.textContent = '▶️'; // שנה לסמל הפעלה
+                            this.setAttribute('aria-label', 'המשך הקראה');
+                        } else {
+                            speechSynthesis.resume(); // המשך
+                            this.textContent = '⏸️'; // שנה לסמל השהיה
+                            this.setAttribute('aria-label', 'השהה הקראה');
+                        }
+                    } else {
+                        stopSpeaking(); // עצור כל הקראה אחרת (בין אם פסקה אחרת או שהיתה הקראה כלשהי)
+                        currentUtterance = new SpeechSynthesisUtterance(textToRead);
+                        currentUtterance.lang = 'he-IL'; // שפה עברית
+                        currentReadParagraphButton = this; // שמור הפניה לכפתור זה
+
+                        currentUtterance.onstart = () => {
+                            currentReadParagraphButton.textContent = '⏸️'; // שנה ללחצן השהיה
+                            currentReadParagraphButton.setAttribute('aria-label', 'השהה הקראה');
+                            globalPauseButton.classList.add('visible'); // הצג כפתור פאוז גלובלי
+                        };
+                        currentUtterance.onend = () => {
+                            currentReadParagraphButton.textContent = '🔊'; // חזרה לסמל רמקול
+                            currentReadParagraphButton.setAttribute('aria-label', 'הקרא פסקה');
+                            currentUtterance = null;
+                            currentReadParagraphButton = null;
+                            globalPauseButton.classList.remove('visible'); // הסתר כפתור פאוז גלובלי
+                        };
+                        currentUtterance.onerror = (event) => {
+                            console.error('Speech synthesis error:', event.error);
+                            currentReadParagraphButton.textContent = '🔊';
+                            currentReadParagraphButton.setAttribute('aria-label', 'הקרא פסקה');
+                            currentUtterance = null;
+                            currentReadParagraphButton = null;
+                            globalPauseButton.classList.remove('visible'); // הסתר כפתור פאוז גלובלי
+                            alert('אירעה שגיאה בהקראה. ייתכן שהדפדפן אינו תומך בהקראה או שהשפה אינה זמינה.');
+                        };
+
+                        speechSynthesis.speak(currentUtterance);
+                    }
+                });
+            });
+
+            // Tooltip/Modal Functionality (Example - needs more detail for full implementation)
+            const toolCards = document.querySelectorAll('.tool-card');
+            toolCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const toolName = this.dataset.tool;
+                    console.log('Clicked on tool:', toolName);
+                });
+            });
+
+            // Evening Tip Functionality (Example - assuming Gemini API call or similar)
+            const getEveningTipBtn = document.getElementById('getEveningTipBtn');
+            const eveningChallengeInput = document.getElementById('eveningChallengeInput');
+            const eveningTipOutput = document.getElementById('eveningTipOutput');
+            const eveningTipLoading = document.getElementById('eveningTipLoading');
+
+            if (getEveningTipBtn) {
+                getEveningTipBtn.addEventListener('click', async function() {
+                    const challengeText = eveningChallengeInput.value.trim();
+                    if (!challengeText) {
+                        eveningTipOutput.classList.remove('hidden');
+                        eveningTipOutput.textContent = 'אנא הזן תיאור של הקושי.';
+                        return;
+                    }
+
+                    eveningTipOutput.classList.add('hidden');
+                    eveningTipLoading.classList.remove('hidden');
+
+                    try {
+                        const response = await new Promise(resolve => setTimeout(() => {
+                            const tips = [
+                                "נסו ליצור שגרת ערב קבועה וצפויה, עם אותן פעולות בכל יום.",
+                                "השתמשו בטיימר חזותי כדי לעזור לילד לראות כמה זמן נשאר לכל משימה.",
+                                "פרקו משימות גדולות (כמו 'סדר את החדר') למשימות קטנות יותר ('שים את הבגדים המלוכלכים בסל הכביסה').",
+                                "הציעו בחירה מוגבלת, למשל: 'אתה רוצה להתקלח קודם או לצחצח שיניים קודם?'",
+                                "שבחו והתייחסו באופן חיובי לכל מאמץ קטן, גם אם המשימה לא הושלמה במלואה.",
+                                "צרו לוח משימות מצויר שבו הילד יכול לסמן כל משימה שהושלמה."
+                            ];
+                            const randomTip = tips[Math.floor(Math.random() * tips.length)];
+                            resolve({ success: true, tip: randomTip });
+                        }, 1500)); // Simulate network delay
+
+                        if (response.success) {
+                            eveningTipOutput.textContent = response.tip;
+                            eveningTipOutput.classList.remove('hidden');
+                        } else {
+                            eveningTipOutput.textContent = 'אירעה שגיאה בקבלת הטיפ. נסה שוב.';
+                            eveningTipOutput.classList.remove('hidden');
+                        }
+                    } catch (error) {
+                        console.error('Error fetching tip:', error);
+                        eveningTipOutput.textContent = 'אירעה שגיאה בקבלת הטיפ. אנא נסה שוב מאוחר יותר.';
+                        eveningTipOutput.classList.remove('hidden');
+                    } finally {
+                        eveningTipLoading.classList.add('hidden');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
