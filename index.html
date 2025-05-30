@@ -7,165 +7,143 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* Base styles */
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #fef3c7; /* bg-amber-50 changed to a slightly darker shade for contrast */
-            color: #44403c; /* text-stone-800 */
+            background-color: #fffbeb; /* bg-amber-50 equivalent */
+            color: #44403c; /* text-stone-800 equivalent */
         }
+
+        /* RTL direction */
         .rtl {
             direction: rtl;
         }
-        .ltr {
-            direction: ltr;
+
+        /* Main Navigation Buttons */
+        .nav-link {
+            @apply px-4 py-2 text-stone-700 hover:bg-amber-200 hover:text-stone-900 rounded-lg transition-colors;
         }
 
-        /* סגנון הלחצנים הראשיים וגם הכפתורים בתוך הטקסט */
-        .nav-link, .inline-button {
-            /* צורה אליפטית, ממוספרת */
-            @apply px-8 py-4 text-2xl font-extrabold text-stone-800 bg-amber-100 rounded-full border-4 border-amber-400 shadow-xl transition-all duration-300;
-            /* הגברנו את הצל ל-shadow-xl. מעבר צבע וקנה מידה בהובר */
-            @apply hover:bg-amber-200 hover:text-stone-900 hover:shadow-2xl transform hover:scale-105;
-            flex-shrink: 0; /* למנוע מהכפתורים להתכווץ על מסכים קטנים מדי */
-            min-width: 120px; /* רוחב מינימלי כדי לשמור על צורה גם עם טקסט קצר */
-            text-align: center; /* יישור טקסט למרכז */
-            position: relative; /* עבור מיקום המספרים */
-            display: inline-flex; /* כדי שהאליפסות יהיו בשורה ויכבדו רווחים */
-            align-items: center;
-            justify-content: center;
-            text-decoration: none; /* הסרת קו תחתון מקישורים */
-            white-space: nowrap; /* מונע שבירת שורה בתוך הכפתור */
-        }
-
-        /* הוספת מספרים לכפתורים */
-        .nav-link::before, .inline-button::before {
-            content: attr(data-number); /* שימוש בתכונת data-number */
-            position: absolute;
-            top: -0.5rem; /* מיקום המספר מעל הכפתור */
-            left: 0.5rem; /* מיקום המספר משמאל */
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #d97706; /* צבע המספר */
-            z-index: 10; /* ודא שהמספר מעל הכל */
-        }
-
-        /* סגנון ללחצן הפעיל/הנבחר */
         .nav-link.active {
-            @apply bg-amber-500 text-white font-extrabold shadow-2xl scale-105 border-amber-600;
+            @apply bg-amber-300 text-stone-900 font-semibold;
         }
 
-        /* סגנון למיכל הניווט - עוטף את הלחצנים ונותן להם מרווח הדדי גדול */
-        .nav-container {
-            background-color: #fffbeb; /* רקע בהיר מעט שונה בתוך המיכל */
-            padding: 2rem; /* מרווח פנימי גדול יותר למיכל */
-            border-radius: 1.5rem; /* פינות מעוגלות יותר למיכל */
-            box-shadow: inset 0 4px 6px -1px rgba(0, 0, 0, 0.1), inset 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* צל פנימי עמוק יותר */
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            /* הגדלה משמעותית של המרווח בין הלחצנים (בין האליפסות) */
-            gap: 2rem; /* מרווח גדול בין הלחצנים כברירת מחדל */
-            margin-bottom: 2rem; /* mb-8 */
-        }
-        @media (min-width: 768px) { /* שינוי מ-640 ל-768 לשיפור תגובתיות */
-            .nav-container {
-                gap: 3rem; /* הגדלה נוספת של המרווח במסכים גדולים יותר */
-            }
-        }
-        @media (min-width: 1024px) {
-            .nav-container {
-                gap: 4rem; /* מרווח גדול עוד יותר במסכי דסקטופ רחבים */
-            }
+        /* Style for text inside main buttons (underline, bold, curly braces) */
+        .nav-link .nav-text {
+            text-decoration: underline;
+            font-weight: bold;
         }
 
-
-        .content-section {
-            @apply p-6 bg-white rounded-xl shadow-lg mt-4 min-h-[60vh];
-        }
-        .tool-card {
-            @apply bg-emerald-50 p-4 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer text-right;
-        }
-        .tool-card h3 {
-            @apply text-emerald-700 font-semibold text-lg mb-2;
-        }
-        .modal {
-            @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 transition-opacity duration-300;
-        }
-        .modal-content {
-            @apply bg-white p-6 rounded-lg shadow-xl max-w-lg w-full text-right;
-        }
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 300px;
-            max-height: 350px;
-        }
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 350px;
-                max-width: 700px;
-            }
-        }
-        .btn {
-            @apply px-4 py-2 rounded-lg text-white font-semibold transition-colors;
-        }
-        .btn-primary {
-            @apply bg-amber-500 hover:bg-amber-600;
-        }
-        .btn-secondary {
-            @apply bg-emerald-500 hover:bg-emerald-600;
-        }
+        /* Cat ear decoration */
         .cat-ear {
             width: 0;
             height: 0;
             border-left: 20px solid transparent;
             border-right: 20px solid transparent;
-            border-bottom: 30px solid #fbbf24;
+            border-bottom: 30px solid #fbbf24; /* amber-400 */
             display: inline-block;
             margin: 0 2px;
         }
+
+        /* Content Sections */
+        .content-section {
+            @apply p-6 bg-white rounded-xl shadow-lg mt-4 min-h-[60vh];
+        }
+
+        /* Tool Cards (from Toolbox section) */
+        .tool-card {
+            @apply bg-emerald-50 p-4 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer;
+            border: 1px solid #d1fae5; /* emerald-100 */
+        }
+
+        .tool-card h3 {
+            @apply text-xl font-semibold text-emerald-800 mb-2;
+        }
+
+        .tool-card p {
+            @apply text-stone-700 text-sm;
+        }
+
+        /* Paragraph with read button */
+        .paragraph-with-btn {
+            @apply flex items-start space-x-2 rtl:space-x-reverse mb-4 p-2 rounded-lg;
+        }
+
+        .paragraph-with-btn .read-paragraph-btn {
+            @apply bg-blue-500 text-white p-2 rounded-full text-sm hover:bg-blue-600 transition-colors flex-shrink-0;
+        }
+
+        .paragraph-with-btn .paragraph-text {
+            @apply flex-grow text-lg leading-relaxed;
+        }
+
+        .inline-button {
+            @apply text-blue-600 hover:underline font-semibold;
+        }
+
+        /* Chart container */
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Custom buttons */
+        .btn {
+            @apply px-6 py-3 rounded-lg font-semibold text-lg transition-colors duration-200;
+        }
+
+        .btn-primary {
+            @apply bg-emerald-600 text-white hover:bg-emerald-700;
+        }
+
+        .btn-secondary {
+            @apply bg-amber-500 text-white hover:bg-amber-600;
+        }
+
+        /* Loading spinner */
         .loading-spinner {
             border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: #fbbf24;
+            border-top: 4px solid #f97316; /* amber-500 */
             border-radius: 50%;
             width: 24px;
             height: 24px;
             animation: spin 1s linear infinite;
             display: inline-block;
             vertical-align: middle;
-            margin-right: 8px;
+            margin-inline-end: 8px;
         }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
 
-        /* סגנון כפתור הקראת פסקה / השהיה */
-        .read-paragraph-btn {
-            @apply inline-flex items-center justify-center w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors duration-200 text-xs font-bold mr-2 ml-1; /* קטן, עגול ובולט */
-            flex-shrink: 0; /* למנוע מהכפתור להתכווץ */
-        }
-        .paragraph-with-btn {
-            @apply flex items-start mb-3 text-lg leading-relaxed; /* גמישות כדי להכיל את הכפתור */
-        }
-        .paragraph-text {
-            @apply flex-grow; /* מאפשר לטקסט לתפוס את רוב המקום */
+        /* Global pause button for speech synthesis */
+        #global-pause-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            @apply bg-blue-500 text-white p-3 rounded-full shadow-lg z-50 hover:bg-blue-600 transition-opacity duration-300;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
         }
 
-        /* סגנון כפתור הפאוז הגלובלי */
-        #global-pause-btn {
-            @apply fixed bottom-4 left-1/2 -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-full shadow-lg text-lg font-bold transition-all duration-300 z-40;
-            @apply hover:bg-red-600 hover:scale-105;
-            display: none; /* נסתר כברירת מחדל, יוצג רק כשיש הקראה פעילה */
-        }
         #global-pause-btn.visible {
-            display: flex; /* מציג את הכפתור כאשר הקראה פעילה */
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        /* Highlight for current speaking paragraph */
+        .highlight-speaking {
+            background-color: #fffbeb !important; /* amber-50 equivalent, using !important for override */
         }
     </style>
 </head>
-<body>
+<body class="bg-amber-50 text-stone-800 rtl">
 
     <div id="app-container" class="container mx-auto p-4 max-w-5xl">
         <header class="my-8 text-center">
@@ -173,11 +151,11 @@
             <p class="text-xl text-stone-700 mt-2">כשהמסך קורא והערב מחכה: סיפור אינטראקטיבי</p>
         </header>
 
-        <nav class="nav-container">
-            <button data-section="intro" class="nav-link active" data-number="1"><span>הכירו את יאיר</span></button>
-            <button data-section="challenge" class="nav-link" data-number="2"><span>האתגר של הערב</span></button>
-            <button data-section="toolbox" class="nav-link" data-number="3"><span>ארגז הכלים</span></button>
-            <button data-section="journey" class="nav-link" data-number="4"><span>המסע של יאיר</span></button>
+        <nav class="bg-amber-100 p-3 rounded-lg shadow-md mb-8 flex justify-center space-x-2 sm:space-x-4 rtl:space-x-reverse">
+            <button data-section="intro" class="nav-link active">{<span class="nav-text">הכירו את יאיר</span>}</button>
+            <button data-section="challenge" class="nav-link">{<span class="nav-text">האתגר של הערב</span>}</button>
+            <button data-section="toolbox" class="nav-link">{<span class="nav-text">ארגז הכלים</span>}</button>
+            <button data-section="journey" class="nav-link">{<span class="nav-text">המסע של יאיר</span>}</button>
         </nav>
 
         <main>
@@ -187,7 +165,7 @@
                 </div>
                 <div class="paragraph-with-btn" data-paragraph-id="intro-p1">
                     <button class="read-paragraph-btn" aria-label="הקרא פסקה">🔊</button>
-                    <span class="paragraph-text">היה היה פעם, בבית בעמק קסום, עם ריח תפוזים מתוק שעלה מכל עבר, חי לו יאיר, גור חתולים זריז בן עשר. ליאיר היו עיניים ירוקות נוצצות ושפם ארוך ארוך שקפץ משמחה בכל פעם שחשב על הרפתקה חדשה. הוא גר עם אבא שלו, ועם אחיו אורן בן ה-14, שהיה בוגר ושקט. למרות שיאיר ואורן רבו לא מעט על המחשב, תמיד היה ברור שהם אוהבים מאוד אחד את השני. את אחותו הגדולה, קרן בת ה-17, שגרה בפנימייה, יאיר זכה לראות רק לעיתים רחוקות, אך בכל מפגש הם אהבו מאוד ליצור יחד, לדבר על אומנות וגם לשתף ברגשות. רגעים איתה היו תמיד מיוחדים ואינטימיים. בואו <a href="#" class="inline-button" data-number="1" data-section-target="intro"><span>הכירו את יאיר</span></a> לעומק.</span>
+                    <span class="paragraph-text">היה היה פעם, בבית בעמק קסום, עם ריח תפוזים מתוק שעלה מכל עבר, חי לו יאיר, גור חתולים זריז בן עשר. ליאיר היו עיניים ירוקות נוצצות ושפם ארוך ארוך שקפץ משמחה בכל פעם שחשב על הרפתקה חדשה. הוא גר עם אבא שלו, ועם אחיו אורן בן ה-14, שהיה בוגר ושקט. למרות שיאיר ואורן רבו לא מעט על המחשב, תמיד היה ברור שהם אוהבים מאוד אחד את השני. את אחותו הגדולה, קרן בת ה-17, שגרה בפנימייה, יאיר זכה לראות רק לעיתים רחוקות, אך בכל מפגש הם אהבו מאוד ליצור יחד, לדבר על אומנות וגם לשתף ברגשות. רגעים איתה היו תמיד מיוחדים ואינטימיים. בואו <a href="#" class="inline-button" data-section-target="intro">הכירו את יאיר</a> לעומק.</span>
                 </div>
                 <div class="paragraph-with-btn" data-paragraph-id="intro-p2">
                     <button class="read-paragraph-btn" aria-label="הקרא פסקה">🔊</button>
@@ -213,7 +191,7 @@
                 </div>
                 <div class="paragraph-with-btn" data-paragraph-id="challenge-p1">
                     <button class="read-paragraph-btn" aria-label="הקרא פסקה">🔊</button>
-                    <span class="paragraph-text">כשהשמש הייתה שוקעת וקרירות נעימה מילאה את הבית, אבא של יאיר היה קורא: "יאיר! יאיר, חמוד, ארוחת ערב מוכנה!" קולו היה נעים ורגוע בהתחלה, כמו ליטוף פרווה. אבל יאיר היה כל כך שקוע במסך הטלפון שלו – בוהה בעיניים ירוקות ומוצצות במסך הזוהר, שפמו רועד מהתרגשות מאיזה סרטון מצחיק או משחק מהיר – שהוא פשוט לא שמע. וזהו בדיוק <a href="#" class="inline-button" data-number="2" data-section-target="challenge"><span>האתגר של הערב</span></a>.</span>
+                    <span class="paragraph-text">כשהשמש הייתה שוקעת וקרירות נעימה מילאה את הבית, אבא של יאיר היה קורא: "יאיר! יאיר, חמוד, ארוחת ערב מוכנה!" קולו היה נעים ורגוע בהתחלה, כמו ליטוף פרווה. אבל יאיר היה כל כך שקוע במסך הטלפון שלו – בוהה בעיניים ירוקות ומוצצות במסך הזוהר, שפמו רועד מהתרגשות מאיזה סרטון מצחיק או משחק מהיר – שהוא פשוט לא שמע. וזהו בדיוק <a href="#" class="inline-button" data-section-target="challenge">האתגר של הערב</a>.</span>
                 </div>
                 <div class="paragraph-with-btn" data-paragraph-id="challenge-p2">
                     <button class="read-paragraph-btn" aria-label="הקרא פסקה">🔊</button>
@@ -230,22 +208,11 @@
             </section>
 
             <section id="toolbox-section" class="content-section hidden">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-3xl font-semibold text-emerald-700">ארגז הכלים של אבא ויאיר</h2>
-                </div>
-                <div class="paragraph-with-btn" data-paragraph-id="toolbox-p1">
-                    <button class="read-paragraph-btn" aria-label="הקרא פסקה">🔊</button>
-                    <span class="paragraph-text">אבא של יאיר ראה את התסכול בעיניים הירוקות של גור החתולים שלו, והוא ידע שזה לא שובבות רגילה. "יאיר חמוד," אבא אמר בערב אחד, כשיאיר נאנח ליד השולחן המבולגן, "אני רואה שקשה לך עכשיו. אני יודע שזה לא קל כשהמוח שלך רוצה לרוץ לכל מיני כיוונים בבת אחת." יאיר ואבא החליטו לבנות <a href="#" class="inline-button" data-number="3" data-section-target="toolbox"><span>ארגז כלים</span></a> חדש.</span>
-                </div>
-                <div class="paragraph-with-btn" data-paragraph-id="toolbox-p2">
-                    <button class="read-paragraph-btn" aria-label="הקרא פסקה">🔊</button>
-                    <span class="paragraph-text">אבא חיבק את יאיר חזק, ואז חשב לעצמו: "איך אני יכול לעזור ליאיר למצוא את הדרך **לשגרת הערב**?" הוא נזכר כמה יאיר חכם, וכמה הוא אוהב ללמוד דברים חדשים. אבא החליט שצריך **ללמד את יאיר טריקים חדשים** שיעזרו לו, ממש כמו שמלמדים גור חתולים איך לקפוץ הכי גבוה או לתפוס פרפר.</span>
-                </div>
-                <div class="paragraph-with-btn" data-paragraph-id="toolbox-p3">
-                    <button class="read-paragraph-btn" aria-label="הקרא פסקה">🔊</button>
-                    <span class="paragraph-text">למחרת בבוקר, אבא הציע ליאיר רעיון: "בוא נבנה לנו **'ארגז כלים של ערב'**," אמר אבא בחיוך. "בארגז הזה יהיו כל מיני רעיונות ושיטות שיעזרו לך למצוא את הדרך בחזרה לשגרה כשקשה לך להתארגן." יאיר, סקרן מטבעו, אהב את הרעיון של "ארגז כלים". והם התחילו לנסות!</span>
-                </div>
-
+                <h2 class="text-3xl font-semibold text-emerald-700 mb-4">ארגז הכלים של אבא ויאיר</h2>
+                <p class="mb-6 text-lg leading-relaxed">אבא של יאיר ראה את התסכול בעיניים הירוקות של גור החתולים שלו, והוא ידע שזה לא שובבות רגילה. "יאיר חמוד," אבא אמר בערב אחד, כשיאיר נאנח ליד השולחן המבולגן, "אני רואה שקשה לך עכשיו. אני יודע שזה לא קל כשהמוח שלך רוצה לרוץ לכל מיני כיוונים בבת אחת."</p>
+                <p class="mb-6 text-lg leading-relaxed">אבא חיבק את יאיר חזק, ואז חשב לעצמו: "איך אני יכול לעזור ליאיר למצוא את הדרך בחזרה לשביל של הערב?" הוא נזכר כמה יאיר חכם, וכמה הוא אוהב ללמוד דברים חדשים. אבא החליט שצריך **ללמד את יאיר טריקים חדשים** שיעזרו לו, ממש כמו שמלמדים גור חתולים איך לקפוץ הכי גבוה או לתפוס פרפר.</p>
+                <p class="mb-8 text-lg leading-relaxed">למחרת בבוקר, אבא הציע ליאיר רעיון: "בוא נבנה לנו **'ארגז כלים של ערב'**," אמר אבא בחיוך. "בארגז הזה יהיו כל מיני רעיונות ושיטות שיעזרו לך למצוא את הדרך בחזרה לשגרה כשקשה לך להתארגן." יאיר, סקרן מטבעו, אהב את הרעיון של "ארגז כלים". והם התחילו לנסות!</p>
+                
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div class="tool-card" data-tool="schedule">
                         <h3>📅 לוח זמנים מצויר</h3>
@@ -269,225 +236,368 @@
                     </div>
                     <div class="tool-card" data-tool="hugs_stories">
                         <h3>🤗 חיבוקים וסיפורים</h3>
-                        <p>סיום כל ערב בחיבוק וסיפור עזר להירגע ולהטעין כוחות.</p>
+                        <p>סיפור לפני השינה וחיבוק חזק עזרו ליאיר להירגע ולעבור למצב שינה ברוגע.</p>
                     </div>
-                </div>
-
-                <div class="mt-10 p-6 bg-amber-100 rounded-lg shadow-inner text-center">
-                    <h3 class="text-2xl font-semibold text-amber-700 mb-4">✨ יועץ ערב חכם ✨</h3>
-                    <p class="mb-4 text-stone-700">הזינו קושי ספציפי שאתם חווים בשגרת הערב וקבלו טיפ מותאם אישית:</p>
-                    <textarea id="eveningChallengeInput" class="w-full p-3 rounded-lg border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400 mb-4 text-right" rows="3" placeholder="לדוגמה: הילד שלי לא רוצה להתקלח..."></textarea>
-                    <button id="getEveningTipBtn" class="btn btn-primary w-full md:w-auto">קבל טיפ חכם</button>
-                    <div id="eveningTipOutput" class="mt-4 p-3 bg-white rounded-lg border border-emerald-200 text-stone-800 hidden text-right"></div>
-                    <div id="eveningTipLoading" class="hidden mt-4 text-emerald-700">
-                        <div class="loading-spinner"></div>טוען טיפ...
+                    <div class="tool-card" data-tool="choices">
+                        <h3>✅ "האם תרצה...?"</h3>
+                        <p>הצעת בחירה מוגבלת, כמו "האם תרצה מקלחת או צחצוח שיניים קודם?" נתנה ליאיר תחושת שליטה.</p>
+                    </div>
+                    <div class="tool-card" data-tool="positive_reinforcement">
+                        <h3>✨ "כל הכבוד!"</h3>
+                        <p>אבא שיבח את יאיר על כל מאמץ קטן, גם אם המשימה לא הושלמה במלואה, וחיזק את הביטחון העצמי שלו.</p>
+                    </div>
+                    <div class="tool-card" data-tool="movement_breaks">
+                        <h3>🤸 "הפסקת תנועה"</h3>
+                        <p>אפשרות לקפוץ או לרוץ לכמה דקות לפני משימה עזרה ליאיר לפרוק אנרגיה ולהתרכז טוב יותר.</p>
                     </div>
                 </div>
             </section>
 
             <section id="journey-section" class="content-section hidden">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-3xl font-semibold text-emerald-700">המסע של יאיר</h2>
+                <h2 class="text-3xl font-semibold text-emerald-700 mb-4">המסע של יאיר: הצלחות קטנות בדרך גדולה</h2>
+                <p class="mb-6 text-lg leading-relaxed">בכל יום, יאיר ואבא ניסו כלי אחר מ"ארגז הכלים של הערב". היו ימים שזה הלך מצוין, ויאיר הרגיש כמו גיבור שכבש את פסגת הר האוורסט. בימים אחרים, זה היה קשה יותר, והוא היה מוסח ומתעצבן. אבל אבא תמיד היה שם, סבלני ומבין, וחיזק את יאיר על כל ניסיון, גם אם לא הצליח.</p>
+                <div class="chart-container mb-8">
+                    <canvas id="successChart"></canvas>
                 </div>
-                <div class="paragraph-with-btn" data-paragraph-id="journey-p1">
-                    <button class="read-paragraph-btn" aria-label="הקרא פסקה">🔊</button>
-                    <span class="paragraph-text">הערבים של יאיר לא הפכו לקסם בן לילה. לפעמים עדיין היה לו קשה, ולפעמים הטיימר עדיין הרגיז אותו. אבל עם כל יום שעבר, יאיר למד עוד דרך, ועוד כלי מארגז הכלים המיוחד שלהם. כך, יאיר יצא ל<a href="#" class="inline-button" data-number="4" data-section-target="journey"><span>המסע של יאיר</span></a>.</span>
+                <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mb-8">
+                    <button id="addSuccessBtn" class="btn btn-primary flex-1 sm:flex-none">הוסף יום מוצלח 🎉</button>
+                    <button id="addStruggleBtn" class="btn btn-secondary flex-1 sm:flex-none">הוסף יום מאתגר 😔</button>
                 </div>
-                <div class="paragraph-with-btn" data-paragraph-id="journey-p2">
-                    <button class="read-paragraph-btn" aria-label="הקרא פסקה">🔊</button>
-                    <span class="paragraph-text">אבא שלו תמיד היה שם, עם חיבוק חם, הבנה גדולה, וארגז הכלים המלא ברעיונות חדשים. יאיר התחיל להבין שגם אם המוח שלו קופץ כמו כדור, יש דרכים לרתום אותו, ושאבא תמיד ימצא את הדרך לעזור לו. הוא למד שכל צעד קטן קדימה הוא הצלחה, ושגם אם יום אחד קצת פחות הולך, מחר תמיד אפשר לנסות שוב עם כלי אחר מהארגז.</span>
+                <p class="mb-6 text-lg leading-relaxed">לאט לאט, יאיר התחיל לזהות מתי הקושי עולה. הוא למד לומר: "אבא, אני מרגיש שהמוח שלי קופצני היום," או "אני חושב שאני צריך טיימר משימה עכשיו." הוא הבין שזה בסדר לבקש עזרה, ושכלי הארגז הם חברים שלו במסע הזה.</p>
+
+                <div class="p-6 bg-amber-50 rounded-xl shadow mt-8">
+                    <h3 class="text-2xl font-semibold text-amber-700 mb-4 text-center">תרגיל בשבילך: תן/תני טיפ ליאיר</h3>
+                    <p class="mb-4 text-lg leading-relaxed text-center">חשבו על קושי ספציפי של יאיר בשגרת הערב. איך הייתם מנסחים/ות טיפ קצר ומעשי עבורו, בסגנון "ארגז הכלים", תוך שימוש במטאפורה של "כלי" ספציפי?</p>
+                    <div class="mb-4">
+                        <label for="eveningChallengeInput" class="block text-lg font-medium text-stone-700 mb-2">תאר/י את הקושי של יאיר:</label>
+                        <input type="text" id="eveningChallengeInput" class="w-full p-3 border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="לדוגמה: יאיר נתקע מול המסך ולא שומע כשקוראים לו לארוחת ערב.">
+                    </div>
+                    <button id="getEveningTipBtn" class="btn btn-primary w-full py-3 text-lg">קבל/י טיפ מארגז הכלים</button>
+                    <div id="eveningTipLoading" class="hidden text-center mt-4 text-amber-700">
+                        <span class="loading-spinner"></span> טוען טיפ...
+                    </div>
+                    <p id="eveningTipOutput" class="hidden mt-4 p-4 bg-amber-100 border border-amber-200 rounded-lg text-lg text-stone-800 text-right"></p>
                 </div>
-                <div class="paragraph-with-btn" data-paragraph-id="journey-p3">
-                    <button class="read-paragraph-btn" aria-label="הקרא פסקה">🔊</button>
-                    <span class="paragraph-text">החשוב ביותר, יאיר הבין שהוא לא לבד בהתמודדות, ואהבה וסבלנות הן לפעמים הכלים הכי חזקים בארגז.</span>
+
+                <div class="p-6 bg-emerald-50 rounded-xl shadow mt-8">
+                    <h3 class="text-2xl font-semibold text-emerald-700 mb-4 text-center">אולי סיפור לפני השינה?</h3>
+                    <p class="mb-4 text-lg leading-relaxed text-center">יאיר תמיד אהב סיפורים. איזה סיפור קצר ומרגיע הייתם מספרים לו לפני השינה, המבוסס על מילת מפתח אחת?</p>
+                    <div class="mb-4">
+                        <label for="storyKeywordInput" class="block text-lg font-medium text-stone-700 mb-2">מילת מפתח/נושא לסיפור:</label>
+                        <input type="text" id="storyKeywordInput" class="w-full p-3 border border-emerald-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="לדוגמה: ענן, כוכב, חבר, פרפר">
+                    </div>
+                    <button id="generateStoryBtn" class="btn btn-secondary w-full py-3 text-lg">צור/צרי רעיון לסיפור</button>
+                    <div id="storyIdeaLoading" class="hidden text-center mt-4 text-emerald-700">
+                        <span class="loading-spinner"></span> יוצר רעיון לסיפור...
+                    </div>
+                    <p id="storyIdeaOutput" class="hidden mt-4 p-4 bg-emerald-100 border border-emerald-200 rounded-lg text-lg text-stone-800 text-right"></p>
                 </div>
             </section>
         </main>
+
+        <footer class="text-center mt-12 py-6 border-t border-amber-200">
+            <p class="text-stone-600">&copy; 2024 סיפור אינטראקטיבי בהשראת יאיר גור החתולים. נוצר באהבה.</p>
+        </footer>
     </div>
 
-    <button id="global-pause-btn">הפסק הכל</button>
+    <button id="global-pause-btn">השהה הקראה</button>
 
     <script>
-        let currentUtterance = null; // משתנה כדי להחזיק את ההקראה הנוכחית
-        let currentReadParagraphButton = null; // משתנה כדי להחזיק את הכפתור של הפסקה המוקראת
-        const globalPauseButton = document.getElementById('global-pause-btn');
-
-        function stopSpeaking() {
-            if (speechSynthesis.speaking) {
-                speechSynthesis.cancel();
-            }
-            if (currentUtterance) {
-                currentUtterance = null;
-            }
-            // איפוס כפתורי הקראת פסקה
-            if (currentReadParagraphButton) {
-                currentReadParagraphButton.textContent = '🔊'; // חזרה לסמל רמקול
-                currentReadParagraphButton.setAttribute('aria-label', 'הקרא פסקה');
-                currentReadParagraphButton = null;
-            }
-            globalPauseButton.classList.remove('visible'); // הסתר את כפתור הפאוז הגלובלי
-        }
-
         document.addEventListener('DOMContentLoaded', function () {
+            // --- DOM Elements ---
             const navLinks = document.querySelectorAll('.nav-link');
-            const inlineButtons = document.querySelectorAll('.inline-button'); // בחר את הכפתורים החדשים
             const sections = document.querySelectorAll('.content-section');
-            const readParagraphButtons = document.querySelectorAll('.read-paragraph-btn');
+            const addSuccessBtn = document.getElementById('addSuccessBtn');
+            const addStruggleBtn = document.getElementById('addStruggleBtn');
+            const eveningChallengeInput = document.getElementById('eveningChallengeInput');
+            const getEveningTipBtn = document.getElementById('getEveningTipBtn');
+            const eveningTipOutput = document.getElementById('eveningTipOutput');
+            const eveningTipLoading = document.getElementById('eveningTipLoading');
+            const storyKeywordInput = document.getElementById('storyKeywordInput');
+            const generateStoryBtn = document.getElementById('generateStoryBtn');
+            const storyIdeaOutput = document.getElementById('storyIdeaOutput');
+            const storyIdeaLoading = document.getElementById('storyIdeaLoading');
+            const readParagraphBtns = document.querySelectorAll('.read-paragraph-btn');
+            const globalPauseBtn = document.getElementById('global-pause-btn');
 
+            // --- Chart Data ---
+            let successData = [0, 0, 0, 0, 0, 0, 0]; // Sunday to Saturday
+            let struggleData = [0, 0, 0, 0, 0, 0, 0];
+            const labels = ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'ש׳']; // Days of the week in Hebrew
+
+            // --- Speech Synthesis Variables ---
+            let currentUtterance = null;
+            let currentParagraphElement = null;
+
+            // --- Speech Synthesis Functions ---
+            function speakText(text, paragraphElement) {
+                // Cancel any ongoing speech
+                if (window.speechSynthesis.speaking) {
+                    window.speechSynthesis.cancel();
+                }
+
+                // Remove highlight from previous paragraph
+                if (currentParagraphElement) {
+                    currentParagraphElement.classList.remove('highlight-speaking');
+                }
+
+                currentParagraphElement = paragraphElement;
+                if (currentParagraphElement) {
+                    currentParagraphElement.classList.add('highlight-speaking'); // Highlight current paragraph
+                }
+
+                currentUtterance = new SpeechSynthesisUtterance(text);
+                currentUtterance.lang = 'he-IL';
+                currentUtterance.rate = 1.0;
+                currentUtterance.pitch = 1.0;
+
+                currentUtterance.onstart = () => {
+                    globalPauseBtn.textContent = 'השהה הקראה';
+                    globalPauseBtn.classList.add('visible');
+                };
+
+                currentUtterance.onpause = () => {
+                    globalPauseBtn.textContent = 'המשך הקראה';
+                };
+
+                currentUtterance.onresume = () => {
+                    globalPauseBtn.textContent = 'השהה הקראה';
+                };
+
+                currentUtterance.onend = () => {
+                    resetSpeechState();
+                };
+
+                currentUtterance.onerror = (event) => {
+                    console.error('Speech synthesis error:', event.error);
+                    resetSpeechState();
+                };
+
+                window.speechSynthesis.speak(currentUtterance);
+            }
+
+            function resetSpeechState() {
+                currentUtterance = null;
+                globalPauseBtn.classList.remove('visible');
+                if (currentParagraphElement) {
+                    currentParagraphElement.classList.remove('highlight-speaking');
+                    currentParagraphElement = null;
+                }
+            }
+
+            globalPauseBtn.addEventListener('click', () => {
+                if (currentUtterance) {
+                    if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+                        window.speechSynthesis.pause();
+                    } else if (window.speechSynthesis.paused) {
+                        window.speechSynthesis.resume();
+                    }
+                }
+            });
+
+            // --- Navigation Logic ---
             function showSection(sectionId) {
-                stopSpeaking(); // עצור הקראה כשמחליפים סקשן
                 sections.forEach(section => {
                     section.classList.add('hidden');
                 });
                 document.getElementById(sectionId + '-section').classList.remove('hidden');
 
-                // עדכון הכפתורים הראשיים
                 navLinks.forEach(link => {
                     link.classList.remove('active');
                     if (link.dataset.section === sectionId) {
                         link.classList.add('active');
                     }
                 });
+
+                resetSpeechState(); // Stop speech when navigating
             }
 
-            // האזנה לכפתורים הראשיים
             navLinks.forEach(link => {
                 link.addEventListener('click', function () {
                     showSection(this.dataset.section);
                 });
             });
 
-            // האזנה לכפתורים החדשים בתוך הטקסט
-            inlineButtons.forEach(button => {
-                button.addEventListener('click', function (e) {
-                    e.preventDefault(); // מונע את התנהגות הקישור הרגילה (לדוגמה, גלילה למעלה)
-                    const targetSection = this.dataset.sectionTarget; // קבל את ה-ID של הסקשן מה-data-section-target
-                    if (targetSection) {
-                        showSection(targetSection);
-                    }
+            // Handle inline buttons that navigate to sections
+            document.querySelectorAll('.inline-button[data-section-target]').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showSection(this.dataset.sectionTarget);
                 });
             });
 
-            // הצגה ראשונית של סקשן "הכירו את יאיר"
-            showSection('intro');
-
-            // Global Pause Button Listener
-            globalPauseButton.addEventListener('click', function() {
-                stopSpeaking();
-            });
-
-            // פונקציונליות הקראת פסקה / השהיה
-            readParagraphButtons.forEach(button => {
+            readParagraphBtns.forEach(button => {
                 button.addEventListener('click', function() {
-                    const paragraphTextElement = this.nextElementSibling; // מניחים שהטקסט הוא ה-span הבא
-                    if (!paragraphTextElement || !paragraphTextElement.classList.contains('paragraph-text')) {
-                        console.error("לא נמצא אלמנט טקסט פסקה תואם.");
-                        return;
+                    const paragraphTextElement = this.nextElementSibling;
+                    if (paragraphTextElement) {
+                        speakText(paragraphTextElement.textContent, this.closest('.paragraph-with-btn'));
                     }
+                });
+            });
 
-                    const textToRead = paragraphTextElement.textContent.trim();
-
-                    // אם אותה פסקה כבר מוקראת
-                    if (currentUtterance && currentReadParagraphButton === this) {
-                        if (speechSynthesis.speaking) {
-                            speechSynthesis.pause(); // השהה
-                            this.textContent = '▶️'; // שנה לסמל הפעלה
-                            this.setAttribute('aria-label', 'המשך הקראה');
-                        } else {
-                            speechSynthesis.resume(); // המשך
-                            this.textContent = '⏸️'; // שנה לסמל השהיה
-                            this.setAttribute('aria-label', 'השהה הקראה');
+            // --- Chart Initialization and Updates ---
+            const ctx = document.getElementById('successChart').getContext('2d');
+            const successChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'ימים מוצלחים',
+                        data: successData,
+                        backgroundColor: 'rgba(76, 175, 80, 0.6)', // Green
+                        borderColor: 'rgba(76, 175, 80, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'ימים מאתגרים',
+                        data: struggleData,
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)', // Red
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
                         }
-                    } else {
-                        stopSpeaking(); // עצור כל הקראה אחרת (בין אם פסקה אחרת או שהיתה הקראה כלשהי)
-                        currentUtterance = new SpeechSynthesisUtterance(textToRead);
-                        currentUtterance.lang = 'he-IL'; // שפה עברית
-                        currentReadParagraphButton = this; // שמור הפניה לכפתור זה
-
-                        currentUtterance.onstart = () => {
-                            currentReadParagraphButton.textContent = '⏸️'; // שנה ללחצן השהיה
-                            currentReadParagraphButton.setAttribute('aria-label', 'השהה הקראה');
-                            globalPauseButton.classList.add('visible'); // הצג כפתור פאוז גלובלי
-                        };
-                        currentUtterance.onend = () => {
-                            currentReadParagraphButton.textContent = '🔊'; // חזרה לסמל רמקול
-                            currentReadParagraphButton.setAttribute('aria-label', 'הקרא פסקה');
-                            currentUtterance = null;
-                            currentReadParagraphButton = null;
-                            globalPauseButton.classList.remove('visible'); // הסתר כפתור פאוז גלובלי
-                        };
-                        currentUtterance.onerror = (event) => {
-                            console.error('Speech synthesis error:', event.error);
-                            currentReadParagraphButton.textContent = '🔊';
-                            currentReadParagraphButton.setAttribute('aria-label', 'הקרא פסקה');
-                            currentUtterance = null;
-                            currentReadParagraphButton = null;
-                            globalPauseButton.classList.remove('visible'); // הסתר כפתור פאוז גלובלי
-                            alert('אירעה שגיאה בהקראה. ייתכן שהדפדפן אינו תומך בהקראה או שהשפה אינה זמינה.');
-                        };
-
-                        speechSynthesis.speak(currentUtterance);
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'גרף התקדמות שגרת הערב של יאיר',
+                            font: {
+                                size: 18,
+                                family: 'Arial'
+                            }
+                        },
+                        tooltip: {
+                            rtl: true,
+                            titleFont: {
+                                family: 'Arial'
+                            },
+                            bodyFont: {
+                                family: 'Arial'
+                            }
+                        },
+                        legend: {
+                            labels: {
+                                font: {
+                                    family: 'Arial'
+                                }
+                            },
+                            rtl: true,
+                            position: 'top',
+                            align: 'center'
+                        }
+                    },
+                    indexAxis: 'x',
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeOutQuart'
                     }
-                });
+                }
             });
 
-            // Tooltip/Modal Functionality (Example - needs more detail for full implementation)
-            const toolCards = document.querySelectorAll('.tool-card');
-            toolCards.forEach(card => {
-                card.addEventListener('click', function() {
-                    const toolName = this.dataset.tool;
-                    console.log('Clicked on tool:', toolName);
-                });
+            function updateChart() {
+                successChart.update();
+            }
+
+            // Simulate adding data for the current day
+            const currentDayIndex = new Date().getDay(); // 0 for Sunday, 1 for Monday, etc.
+
+            addSuccessBtn.addEventListener('click', function () {
+                successData[currentDayIndex]++;
+                updateChart();
             });
 
-            // Evening Tip Functionality (Example - assuming Gemini API call or similar)
-            const getEveningTipBtn = document.getElementById('getEveningTipBtn');
-            const eveningChallengeInput = document.getElementById('eveningChallengeInput');
-            const eveningTipOutput = document.getElementById('eveningTipOutput');
-            const eveningTipLoading = document.getElementById('eveningTipLoading');
+            addStruggleBtn.addEventListener('click', function () {
+                struggleData[currentDayIndex]++;
+                updateChart();
+            });
 
-            if (getEveningTipBtn) {
-                getEveningTipBtn.addEventListener('click', async function() {
-                    const challengeText = eveningChallengeInput.value.trim();
-                    if (!challengeText) {
-                        eveningTipOutput.classList.remove('hidden');
-                        eveningTipOutput.textContent = 'אנא הזן תיאור של הקושי.';
-                        return;
-                    }
+            // --- Gemini API Simulation (replace with actual API calls if integrating) ---
+            async function getGeminiResponse(prompt, outputElement, loadingElement, responseType) {
+                outputElement.classList.add('hidden');
+                loadingElement.classList.remove('hidden');
+                outputElement.textContent = ''; // Clear previous output
 
-                    eveningTipOutput.classList.add('hidden');
-                    eveningTipLoading.classList.remove('hidden');
-
-                    try {
-                        const response = await new Promise(resolve => setTimeout(() => {
+                try {
+                    const response = await new Promise(resolve => setTimeout(() => {
+                        // Dummy responses based on prompt keywords
+                        if (responseType === 'tip') {
                             const tips = [
-                                "נסו ליצור שגרת ערב קבועה וצפויה, עם אותן פעולות בכל יום.",
-                                "השתמשו בטיימר חזותי כדי לעזור לילד לראות כמה זמן נשאר לכל משימה.",
-                                "פרקו משימות גדולות (כמו 'סדר את החדר') למשימות קטנות יותר ('שים את הבגדים המלוכלכים בסל הכביסה').",
+                                "עבור לקושי של יאיר בניתוק מהמסך, אבא יכול להשתמש ב'כלי השעון המעורר': להגדיר שעון שיצלצל 5 דקות לפני זמן הסיום, כדי שיאיר יוכל להתכונן למעבר בצורה הדרגתית, ממש כמו שחתול מתארגן לזינוק.",
+                                "לטיפול בקושי של יאיר להתחיל משימות כמו סידור השולחן, אבא יכול להשתמש ב'כלי הצעד הראשון': להציע ליאיר להתחיל רק במשימה אחת קטנה, כמו 'רק להרים צלחת אחת', ולהחמיא לו על כך, כדי שהמוח שלו יבין שזה אפשרי.",
+                                "כשיאיר מתמהמה בלקיחת התרופה, אבא יכול להשתמש ב'כלי 'במקום'': לקשור את לקיחת התרופה לפעולה אהובה, למשל: 'אחרי התרופה - חיבוק גדול וסיפור קצר'.",
+                                "ליאיר שמתקשה לסיים משימות, אבא יכול להשתמש ב'כלי 'המסיים המהיר'': להציע תחרות קטנה עם עצמו - 'בוא נראה כמה מהר תוכל לסיים את כל הצעצועים מהרצפה'.",
+                                "כשיאיר מוסח בקלות לפני המקלחת, אבא יכול להשתמש ב'כלי 'הצ\'קליסט המצויר'': ליצור יחד איתו צ\'קליסט עם ציורים של כל הפעולות (מקלחת, פיג\'מה, צחצוח שיניים) שיאיר יוכל לסמן כל פעם שהשלים.",
+                                "לקושי של יאיר להפסיק משחק מחשב, אבא יכול להשתמש ב'כלי 'הסוף הפתוח'': להסכים על נקודת סיום ברורה במשחק (למשל: 'רק עד סיום השלב הזה', 'עד שהמפלצת האחרונה נופלת') כדי למנוע קטיעה פתאומית.",
+                                "עבור התסכול של יאיר כשמזכירים לו שוב ושוב, אבא יכול להשתמש ב'כלי 'ההתראה השקטה'': להניח יד על כתפו של יאיר או להראות לו כרטיס עם ציור של 'מקלחת' במקום לחזור על הבקשה בקול.",
+                                "למצב שיאיר משתעמם במשימות כמו קיפול כביסה, אבא יכול להשתמש ב'כלי 'השיר הקופצני'': לשים שיר קצבי שכיף לרקוד ולקפל כביסה יחד לקצב שלו, ממש כמו שחתול משחק עם כדור צמר.",
                                 "הציעו בחירה מוגבלת, למשל: 'אתה רוצה להתקלח קודם או לצחצח שיניים קודם?'",
                                 "שבחו והתייחסו באופן חיובי לכל מאמץ קטן, גם אם המשימה לא הושלמה במלואה.",
                                 "צרו לוח משימות מצויר שבו הילד יכול לסמן כל משימה שהושלמה."
                             ];
                             const randomTip = tips[Math.floor(Math.random() * tips.length)];
-                            resolve({ success: true, tip: randomTip });
-                        }, 1500)); // Simulate network delay
-
-                        if (response.success) {
-                            eveningTipOutput.textContent = response.tip;
-                            eveningTipOutput.classList.remove('hidden');
+                            resolve({ success: true, content: randomTip });
+                        } else if (responseType === 'story') {
+                            const stories = {
+                                "ענן": "היה היה ענן קטן ורך ששט בשמיים הכחולים. הוא פגש כוכבים מנצנצים ולחש להם סודות לפני שהתכרבל לצורת כבשה ונרדם. עכשיו, גם אתה יכול לצלול לשנת לילה רכה כמו ענן.",
+                                "כוכב": "מעל העצים הגבוהים, כוכב קטן הבזיק באור חם. הוא לא מיהר לשום מקום, רק נצנץ בשקט, שומר על חלומות מתוקים. הוא מאחל לך לילה טוב ושינה נעימה.",
+                                "חבר": "דבון קטן פגש גור חתולים והם שיחקו יחד כל היום. כשהשמש שקעה, הם חיבקו חיבוק גדול וידעו שהחברות שלהם תמיד תהיה שם, אפילו בחלומות. לילה טוב, חבר מתוק.",
+                                "פרפר": "פרפר צבעוני עף מפרח לפרח, אוסף טיפות טל. כשהגיע הערב, הוא מצא עלה גדול, קיפל את כנפיו הצבעוניות ונרדם בחיוך. שתהיה לך שינה רגועה כמו הפרפר."
+                            };
+                            const keyword = prompt.split('מילת המפתח/נושא: "')[1].split('"')[0];
+                            const story = stories[keyword] || "היה היה פעם, סיפור קצר ומרגיע על... (נסה/נסי מילת מפתח אחרת כמו ענן, כוכב, חבר, פרפר)";
+                            resolve({ success: true, content: story });
                         } else {
-                            eveningTipOutput.textContent = 'אירעה שגיאה בקבלת הטיפ. נסה שוב.';
-                            eveningTipOutput.classList.remove('hidden');
+                            resolve({ success: false, message: 'לא נמצא טיפ או סיפור מתאים.' });
                         }
-                    } catch (error) {
-                        console.error('Error fetching tip:', error);
-                        eveningTipOutput.textContent = 'אירעה שגיאה בקבלת הטיפ. אנא נסה שוב מאוחר יותר.';
-                        eveningTipOutput.classList.remove('hidden');
-                    } finally {
-                        eveningTipLoading.classList.add('hidden');
+                    }, 1500)); // Simulate network delay
+
+                    if (response.success) {
+                        outputElement.textContent = response.content;
+                    } else {
+                        outputElement.textContent = response.message || 'אירעה שגיאה. אנא נסה שוב מאוחר יותר.';
                     }
-                });
+                } catch (error) {
+                    console.error('Error in getGeminiResponse:', error);
+                    outputElement.textContent = 'אירעה שגיאה. אנא נסה שוב מאוחר יותר.';
+                } finally {
+                    loadingElement.classList.add('hidden');
+                    outputElement.classList.remove('hidden');
+                }
             }
+
+            getEveningTipBtn.addEventListener('click', function () {
+                const challenge = eveningChallengeInput.value.trim();
+                if (challenge) {
+                    const prompt = `תאר/י קושי בשגרת ערב של ילד עם ADHD: "${challenge}". תן/תני טיפ קצר, ממוקד ומעשי להורים, בסגנון הסיפור "יאיר גור החתולים", תוך שימוש במטאפורה של "ארגז כלים" או "כלי" ספציפי.`;
+                    getGeminiResponse(prompt, eveningTipOutput, eveningTipLoading, 'tip');
+                } else {
+                    eveningTipOutput.textContent = 'אנא הזן/הזיני תיאור של הקושי.';
+                    eveningTipOutput.classList.remove('hidden');
+                }
+            });
+
+            generateStoryBtn.addEventListener('click', function () {
+                const keyword = storyKeywordInput.value.trim();
+                if (keyword) {
+                    const prompt = `צור/צרי רעיון קצר לסיפור ילדים לפני השינה (עד 50 מילים) המבוסס על מילת המפתח/נושא: "${keyword}". הסיפור צריך להיות מרגיע ומעודד.`;
+                    getGeminiResponse(prompt, storyIdeaOutput, storyIdeaLoading, 'story');
+                } else {
+                    storyIdeaOutput.textContent = 'אנא הזן/הזיני מילת מפתח או נושא לסיפור.';
+                    storyIdeaOutput.classList.remove('hidden');
+                }
+            });
+
+            // --- Initial State ---
+            showSection('intro'); // Display the intro section by default
         });
     </script>
 </body>
